@@ -1,0 +1,36 @@
+export ZSH=~/.dotfiles/zsh
+
+export EDITOR="code --wait"
+
+setopt AUTO_CD
+
+# Make a unique array of all .zsh scripts
+typeset -U config_files
+config_files=$ZSH/**/*.zsh
+
+# This excludes any completion.zsh scripts
+# ${arrray:#pattern} produces an array with matching elements removed
+for file in ${config_files:#/completion.zsh}
+do
+    echo $file
+done
+
+# Load the completion system here first
+autoload -Uz compinit
+compinit
+
+# Load all of our completion scripts
+# The (M) reverses the behaviour described above to include only matching elements
+for file in ${(M)config_files:#/completion.zsh}
+do
+    source $file
+done
+
+# Set up Oh My Posh
+eval "$(oh-my-posh init zsh --config "~/.dotfiles/poshtheme.omp.json")"
+
+# Finally load plugins
+PLUGINS_DIR=$ZSH/plugins
+
+source $PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

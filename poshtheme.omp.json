@@ -1,0 +1,48 @@
+{
+    "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+    "version": 2,
+    "final_space": true,
+    "blocks": [
+        {
+            "type": "prompt",
+            "alignment": "left",
+            "segments": [
+                {
+                    "type": "session",
+                    "style": "plain",
+                    "template": "{{ .UserName }}{{ if .WSL }}@WSL:{{ .Env.WSL_DISTRO_NAME }}{{ end }}{{ if .SSHSession }}@{{ .HostName }}{{ end }}",
+                    "foreground": "red"
+                },
+                {
+                    "type": "path",
+                    "style": "plain",
+                    "properties": {
+                        "style": "full"
+                    },
+                    "foreground": "green"
+                },
+                {
+                    "type": "git",
+                    "style": "plain",
+                    "template": "{{ .HEAD }} ",
+                    "foreground": "yellow"
+                },
+                {
+                    "type": "python",
+                    "style": "plain",
+                    "properties": {
+                        "home_enabled": true
+                    },
+                    "template": "{{ if .Venv }}({{ .Venv }}){{ end }} ",
+                    "foreground": "cyan"
+                },
+                {
+                    "type": "text",
+                    "style": "plain",
+                    "template": "{{ if .Root }}#{{ else }}>{{ end }}",
+                    "foreground": "default"
+                }
+            ]
+        }
+    ]
+}
