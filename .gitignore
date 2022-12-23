@@ -1,0 +1,6 @@
+*.local
+*.local.symlink
+
+# ZSH files
+.zcompdump
+.zsh_history
