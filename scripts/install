@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+#
+# 1. Symlink .symlink files into the home directory
+# 2. Run install scripts
+
+# Exit on error
+set -e
+
+# Support for other repo names and locations
+cd "$(dirname "$0")/.."
+DOTFILES_DIR="$(pwd -P)"
+
+_info() {
+    printf "\e[34m%s\e[0m\n" "$1"  # Blue
+}
+
+_prompt() {
+    printf "\e[33m$1\e[0m"  # Yellow
+}
+
+_success() {
+    printf "\e[32m%s\e[0m\n" "$1"  # Green
+}
+
+_error() {
+    printf "\e[31m%s\e[0m\n" "$1"  # Red
+}
+
+create_symlink() {
+    local src=$1 dst=$2
+
+    local skip= overwrite= backup=
+
+    # If the destination already exists and we don't have an action for all files
+    if [[ -e "$dst" ]] && \
+       [[ "$skip_all" == "false" && "$overwrite_all" == "false" && "$backup_all" == "false" ]]; then
+
+        # If the symlink points to our source file then skip it
+        if [[ $(readlink "$dst") == "$src" ]]; then
+            skip="true"
+        else
+            _prompt "$dst already exists, what would you like to do?\n[s]kip [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all >"
+            read action
+
+            case "$action" in
+                s) skip="true" ;;
+                S) skip_all="true" ;;
+                o) overwrite="true" ;;
+                O) overwrite_all="true" ;;
+                b) backup="true" ;;
+                B) backup_all="true" ;;
+                *) _error "\"$action\" is not a valid option [sSoObB], skipping..." ;;
+            esac
+        fi
+    fi
+
+    if [[ "$overwrite" == "true" || "$overwrite_all" == "true" ]]; then
+        rm -rf "$dst"
+        echo "-> overwriting $dst"
+    elif [[ "$backup" == "true" || "$backup_all" == "true" ]]; then
+        mv "$dst" "$dst.original"
+        echo "-> copied $dst to $dst.original"
+    fi
+
+    if [[ "$skip" == "true" || "$skip_all" == "true" ]]; then
+        echo "-> skipping $dst"
+    else
+        ln -s "$src" "$dst"
+        _success "-> linked $src in to $dst"
+    fi
+}
+
+symlink_dotfiles() {
+    local skip_all="false" overwrite_all="false" backup_all="false"
+
+    _info "Symlinking dotfiles into $HOME..."
+
+    # Here we redirect find through FD3 so we can still use stdin (FD0) in create_symlink
+    while read -rd '' -u 3 src; do
+        # basename turns leaves just the file name without   .symlink
+        create_symlink "$src" "$HOME/$(basename "$src" .symlink)"
+
+    # Prune zsh/plugins to avoid unnecessarily searching there
+    done 3< <(find "$DOTFILES_DIR" -path '*/zsh/plugins/*' -prune -o -path '*/.git/*' -prune -o -name '*.symlink' -print0)
+}
+
+run_installers() {
+    _info "Running install scripts..."
+
+    while read -rd '' installer; do
+        echo "-> running $installer"
+        bash "$installer"
+    done < <(find "$DOTFILES_DIR" -path '*/zsh/plugins/*' -prune -o -path '*/.git/*' -prune -o -name "install" -not -path 'scripts/install' -print0)
+}
+
+install() {
+    symlink_dotfiles
+    run_installers
+}
+
+install
