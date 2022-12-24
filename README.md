@@ -12,7 +12,7 @@ Files are arranged by topic (e.g. python).
 - ZSH plugins are included as submodules in `zsh/plugins`
 
 ## Install
-Clone this repo an then run `scripts/install`. This repo is public to avoid authorisation.
+Clone this repo and then run `scripts/install`. This repo is public to avoid authorisation.
 ```bash
 git clone https://github.com/LenAgain/dotfiles ~/.dotfiles
 bash ~/.dotfiles/scripts/install
