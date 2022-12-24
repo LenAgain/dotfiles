@@ -90,7 +90,7 @@ run_installers() {
     while read -rd '' installer; do
         echo "-> running $installer"
         bash "$installer"
-    done < <(find "$DOTFILES_DIR" -path '*/zsh/plugins/*' -prune -o -path '*/.git/*' -prune -o -name "install" -not -path 'scripts/install' -print0)
+    done < <(find "$DOTFILES_DIR" -path '*/zsh/plugins/*' -prune -o -path '*/.git/*' -prune -o -name "install" -not -path '*/scripts/install' -print0)
 }
 
 install() {
