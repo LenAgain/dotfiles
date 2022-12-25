@@ -1,8 +1,10 @@
-path+=$HOME/.local/bin
 export DOTFILES_DIR=$HOME/.dotfiles
 export EDITOR="code --wait"
 
 setopt AUTO_CD
+
+path+=$HOME/.local/bin
+fpath+=$DOTFILES_DIR/zsh/completions
 
 # Load the completion system first
 autoload -Uz compinit bashcompinit
