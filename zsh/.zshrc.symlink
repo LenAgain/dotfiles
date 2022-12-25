@@ -5,8 +5,9 @@ export EDITOR="code --wait"
 setopt AUTO_CD
 
 # Load the completion system first
-autoload -Uz compinit
+autoload -Uz compinit bashcompinit
 compinit
+bashcompinit
 
 # Pruning .git and zsh/plugins for performance
 while read -rd '' file; do
